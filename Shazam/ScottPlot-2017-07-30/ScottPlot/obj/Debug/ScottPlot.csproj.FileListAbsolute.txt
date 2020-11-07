@@ -1,0 +1,9 @@
+C:\Master\an1\PMS\proiect_PMS\Shazam\ScottPlot-2017-07-30\ScottPlot\bin\Debug\ScottPlot.xml
+C:\Master\an1\PMS\proiect_PMS\Shazam\ScottPlot-2017-07-30\ScottPlot\bin\Debug\ScottPlot.dll
+C:\Master\an1\PMS\proiect_PMS\Shazam\ScottPlot-2017-07-30\ScottPlot\bin\Debug\ScottPlot.pdb
+C:\Master\an1\PMS\proiect_PMS\Shazam\ScottPlot-2017-07-30\ScottPlot\obj\Debug\ScottPlot.ScottPlotUC.resources
+C:\Master\an1\PMS\proiect_PMS\Shazam\ScottPlot-2017-07-30\ScottPlot\obj\Debug\ScottPlot.ucInteractive.resources
+C:\Master\an1\PMS\proiect_PMS\Shazam\ScottPlot-2017-07-30\ScottPlot\obj\Debug\ScottPlot.csproj.GenerateResource.Cache
+C:\Master\an1\PMS\proiect_PMS\Shazam\ScottPlot-2017-07-30\ScottPlot\obj\Debug\ScottPlot.dll
+C:\Master\an1\PMS\proiect_PMS\Shazam\ScottPlot-2017-07-30\ScottPlot\obj\Debug\ScottPlot.pdb
+C:\Master\an1\PMS\proiect_PMS\Shazam\ScottPlot-2017-07-30\ScottPlot\obj\Debug\ScottPlot.csprojResolveAssemblyReference.cache

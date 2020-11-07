@@ -9,3 +9,29 @@ C:\Master\an1\PMS\proiect echipa\Shazam\Shazam\obj\Debug\Shazam.Properties.Resou
 C:\Master\an1\PMS\proiect echipa\Shazam\Shazam\obj\Debug\Shazam.csproj.GenerateResource.Cache
 C:\Master\an1\PMS\proiect echipa\Shazam\Shazam\obj\Debug\Shazam.exe
 C:\Master\an1\PMS\proiect echipa\Shazam\Shazam\obj\Debug\Shazam.pdb
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\bin\Debug\Shazam.exe.config
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\obj\Debug\Shazam.exe
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\obj\Debug\Shazam.pdb
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\bin\Debug\Shazam.exe
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\bin\Debug\Shazam.pdb
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\bin\Debug\NAudio.dll
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\bin\Debug\NAudio.xml
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\obj\Debug\Shazam.csprojResolveAssemblyReference.cache
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\obj\Debug\Shazam.Form1.resources
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\obj\Debug\Shazam.Properties.Resources.resources
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\obj\Debug\Shazam.csproj.GenerateResource.Cache
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\bin\Debug\Accord.dll.config
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\bin\Debug\Accord.Audio.dll
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\bin\Debug\Accord.dll
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\bin\Debug\Accord.Math.Core.dll
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\bin\Debug\Accord.Math.dll
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\bin\Debug\ScottPlot.dll
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\bin\Debug\System.Buffers.dll
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\bin\Debug\System.Drawing.Common.dll
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\bin\Debug\ScottPlot.pdb
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\bin\Debug\ScottPlot.xml
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\bin\Debug\Accord.xml
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\bin\Debug\Accord.Audio.xml
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\bin\Debug\Accord.Math.xml
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\bin\Debug\Accord.Math.Core.xml
+C:\Master\an1\PMS\proiect_PMS\Shazam\Shazam\bin\Debug\System.Buffers.xml
