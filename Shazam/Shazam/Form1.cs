@@ -12,6 +12,9 @@ using System.IO;
 using NAudio.Wave;
 using Accord.Math;
 using System.Numerics;
+using NAudio.Dsp; // for FastFourierTransform
+using System.Drawing.Imaging; // for ImageLockMode
+using System.Runtime.InteropServices; // for Marshal
 
 namespace Shazam
 {
@@ -20,13 +23,29 @@ namespace Shazam
         public static int miliseconds = 0;
         public BufferedWaveProvider bwp;
         public Int32 envelopeMax;
+        //spectograma
+        private static int buffers_captured = 0; // total number of audio buffers filled
+        private static int buffers_remaining = 0; // number of buffers which have yet to be analyzed
+
+        private static double unanalyzed_max_sec= 2.5; // maximum amount of unanalyzed audio to maintain in memory
+        private static List<short> unanalyzed_values = new List<short>(); // audio data lives here waiting to be analyzed
+        private static List<List<double>> spec_data; // columns are time points, rows are frequency points
+        private static int spec_width = 600;
+        int fft_size = 4096;
+        private static int spec_height;
+        int pixelsPerBuffer= 10;
+        private static Random rand = new Random();
+        // sound card settings
+        private int rate= 44100;
+        private int buffer_update_hz= 20;
+        //spectograma
 
         private int RATE = 44100; // sample rate of the sound card
         private int BUFFERSIZE = (int)Math.Pow(2, 11); // must be a multiple of 2
         public Form1()
         {
             InitializeComponent();
-        
+            
             var outputFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "NAudio");
             Directory.CreateDirectory(outputFolder);
             var outputFilePath = Path.Combine(outputFolder, "recorded.wav");
@@ -58,6 +77,20 @@ namespace Shazam
                 
                 button1.Enabled = false;
                 button3.Enabled = true;
+
+                // sound card configuration
+                spec_height = fft_size / 2;
+                // fill spectrogram data with empty values
+                spec_data = new List<List<double>>();
+                List<double> data_empty = new List<double>();
+                for (int i = 0; i < spec_height; i++) data_empty.Add(0);
+                for (int i = 0; i < spec_width; i++) spec_data.Add(data_empty);
+                // resize picturebox to accomodate data shape
+                pictureBox1.Width = spec_data.Count;
+                pictureBox1.Height = spec_data[0].Count;
+                pictureBox1.Location = new Point(0, 0);
+                
+               // waveIn.BufferMilliseconds = 1000 / buffer_update_hz;
             };
             waveIn.DataAvailable += (s, a) =>
             {
@@ -67,6 +100,26 @@ namespace Shazam
                 {
                     waveIn.StopRecording();
                 }
+            buffers_captured += 1;
+            buffers_remaining += 1;
+
+            // interpret as 16 bit audio, so each two bytes become one value
+            short[] values = new short[a.Buffer.Length / 2];
+            for (int i = 0; i < a.BytesRecorded; i += 2)
+            {
+                values[i / 2] = (short)((a.Buffer[i + 1] << 8) | a.Buffer[i + 0]);
+            }
+
+            // add these values to the growing list, but ensure it doesn't get too big
+            unanalyzed_values.AddRange(values);
+
+            int unanalyzed_max_count = (int)unanalyzed_max_sec * rate;
+
+            if (unanalyzed_values.Count > unanalyzed_max_count)
+            {
+                unanalyzed_values.RemoveRange(0, unanalyzed_values.Count - unanalyzed_max_count);
+            }
+            
             };
             //pentru oprire inregistrare
             button3.Click += (s, a) =>
@@ -76,7 +129,6 @@ namespace Shazam
                 waveIn.StopRecording();
             };
             this.FormClosing += (s, a) => { closing = true; waveIn.StopRecording(); };
-
             waveIn.RecordingStopped += (s, a) =>
             {
                 writer?.Dispose();
@@ -146,10 +198,10 @@ namespace Shazam
         public double[] FFT(double[] data)
         {
             double[] fft = new double[data.Length]; // this is where we will store the output (fft)
-            Complex[] fftComplex = new Complex[data.Length]; // the FFT function requires complex format
+            System.Numerics.Complex[] fftComplex = new System.Numerics.Complex[data.Length]; // the FFT function requires complex format
             for (int i = 0; i < data.Length; i++)
             {
-                fftComplex[i] = new Complex(data[i], 0.0); // make it complex format (imaginary = 0)
+                fftComplex[i] = new System.Numerics.Complex(data[i], 0.0); // make it complex format (imaginary = 0)
             }
             Accord.Math.FourierTransform.FFT(fftComplex, Accord.Math.FourierTransform.Direction.Forward);
             for (int i = 0; i < data.Length; i++)
@@ -160,11 +212,109 @@ namespace Shazam
             return fft;
             //todo: this could be much faster by reusing variables
         }
+        void Analyze_values()
+        {
+            if (fft_size == 0) return;
+            if (unanalyzed_values.Count < fft_size) return;
+            while (unanalyzed_values.Count >= fft_size) Analyze_chunk();
+            
+        }
+        void Analyze_chunk()
+        {
+            // fill data with FFT info
+            short[] data = new short[fft_size];
+            data = unanalyzed_values.GetRange(0, fft_size).ToArray();
+
+            // remove the left-most (oldest) column of data
+            spec_data.RemoveAt(0);
+
+            // insert new data to the right-most (newest) position
+            List<double> new_data = new List<double>();
+
+            // prepare the complex data which will be FFT'd
+            NAudio.Dsp.Complex[] fft_buffer = new NAudio.Dsp.Complex[fft_size];
+            for (int i = 0; i < fft_size; i++)
+            {
+                //fft_buffer[i].X = (float)unanalyzed_values[i]; // no window
+                fft_buffer[i].X = (float)(unanalyzed_values[i] * FastFourierTransform.HammingWindow(i, fft_size));
+                fft_buffer[i].Y = 0;
+            }
+
+            // perform the FFT
+            FastFourierTransform.FFT(true, (int)Math.Log(fft_size, 2.0), fft_buffer);
+
+            // fill that new data list with fft values
+            for (int i = 0; i < spec_data[spec_data.Count - 1].Count; i++)
+            {
+                double val;
+                val = (double)fft_buffer[i].X + (double)fft_buffer[i].Y;
+                val = Math.Abs(val);
+                new_data.Add(val);
+            }
+
+            new_data.Reverse();
+            spec_data.Insert(spec_data.Count, new_data); // replaces, doesn't append!
+
+            // remove a certain amount of unanalyzed data
+            unanalyzed_values.RemoveRange(0, fft_size / pixelsPerBuffer);
+
+        }
+        void Update_bitmap_with_data()
+        {
+            // create a bitmap we will work with
+            Bitmap bitmap = new Bitmap(spec_data.Count, spec_data[0].Count, PixelFormat.Format8bppIndexed);
+
+            // modify the indexed palette to make it grayscale
+            ColorPalette pal = bitmap.Palette;
+            for (int i = 0; i < 256; i++)
+                pal.Entries[i] = Color.FromArgb(255, i, i, i);
+            bitmap.Palette = pal;
+
+            // prepare to access data via the bitmapdata object
+            BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height),
+                                                    ImageLockMode.ReadOnly, bitmap.PixelFormat);
+
+            // create a byte array to reflect each pixel in the image
+            byte[] pixels = new byte[bitmapData.Stride * bitmap.Height];
+
+            // fill pixel array with data
+            for (int col = 0; col < spec_data.Count; col++)
+            {
+                double scaleFactor;
+                scaleFactor = 8;
+                for (int row = 0; row < spec_data[col].Count; row++)
+                {
+                    int bytePosition = row * bitmapData.Stride + col;
+                    double pixelVal = spec_data[col][row] * scaleFactor;
+                    pixelVal = Math.Max(0, pixelVal);
+                    pixelVal = Math.Min(255, pixelVal);
+                    pixels[bytePosition] = (byte)(pixelVal);
+                }
+            }
+
+            // turn the byte array back into a bitmap
+            Marshal.Copy(pixels, 0, bitmapData.Scan0, pixels.Length);
+            bitmap.UnlockBits(bitmapData);
+
+            // apply the bitmap to the picturebox
+            pictureBox1.Image = bitmap;
+        }
         private void timer1_Tick_1(object sender, EventArgs e)
         {
             miliseconds++;
             label2.Text = (timer1.Interval*miliseconds).ToString();
+
+            Analyze_values();
+            Update_bitmap_with_data();
             UpdateAudioGraph();
+        }
+        private void scottPlotUC2_Load(object sender, EventArgs e)
+        {
+
+        }
+        private void label6_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
