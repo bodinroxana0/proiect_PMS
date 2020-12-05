@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<coreProperties xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
+  <dc:creator>Sergiu Ciumac</dc:creator>
+  <dc:description>SoundFingerprinting.Emy is a native C# client for Emy fingerprints storage. It provides ways to insert, query, delete entries from Emy. To learn more about SoundFingerprinting visit github page https://github.com/AddictedCS/soundfingerprinting. To learn more about Emy visit https://www.emysound.com</dc:description>
+  <dc:identifier>SoundFingerprinting.Emy</dc:identifier>
+  <version>7.4.25</version>
+  <keywords>Audio Identification Fingerprinting Digital Signal Processing Music Recognition Data Mining Content Sound Shazam</keywords>
+  <lastModifiedBy>NuGet.Build.Tasks.Pack, Version=5.7.0.7, Culture=neutral, PublicKeyToken=31bf3856ad364e35;</lastModifiedBy>
+</coreProperties>

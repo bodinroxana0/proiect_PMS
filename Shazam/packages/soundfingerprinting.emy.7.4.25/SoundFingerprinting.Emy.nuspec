@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>SoundFingerprinting.Emy</id>
+    <version>7.4.25</version>
+    <authors>Sergiu Ciumac</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectUrl>https://emysound.com/</projectUrl>
+    <description>SoundFingerprinting.Emy is a native C# client for Emy fingerprints storage. It provides ways to insert, query, delete entries from Emy. To learn more about SoundFingerprinting visit github page https://github.com/AddictedCS/soundfingerprinting. To learn more about Emy visit https://www.emysound.com</description>
+    <releaseNotes>Version 7.4.0 provides FFmpegAudioService that can be used to read audio tracks from files in any format supported by FFmpeg. It is the preffered audio resampler and will become the default service from this version onwards</releaseNotes>
+    <tags>Audio Identification Fingerprinting Digital Signal Processing Music Recognition Data Mining Content Sound Shazam</tags>
+    <repository type="git" url="https://github.com/AddictedCS/soundfingerprinting" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="FFmpeg.AutoGen" version="4.2.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.IO.RecyclableMemoryStream" version="1.3.3" exclude="Build,Analyzers" />
+        <dependency id="NLog" version="4.7.0" exclude="Build,Analyzers" />
+        <dependency id="SoundFingerprinting" version="7.4.24" exclude="Build,Analyzers" />
+        <dependency id="System.Buffers" version="4.5.1" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

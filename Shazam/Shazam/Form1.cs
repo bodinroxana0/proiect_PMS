@@ -15,6 +15,12 @@ using System.Numerics;
 using NAudio.Dsp; // for FastFourierTransform
 using System.Drawing.Imaging; // for ImageLockMode
 using System.Runtime.InteropServices; // for Marshal
+using SoundFingerprinting;
+using SoundFingerprinting.Audio;
+using SoundFingerprinting.InMemory;
+using SoundFingerprinting.Builder;
+using SoundFingerprinting.DAO.Data;
+using SoundFingerprinting.Data;
 
 namespace Shazam
 {
@@ -23,10 +29,12 @@ namespace Shazam
         public static int miliseconds = 0;
         public BufferedWaveProvider bwp;
         public Int32 envelopeMax;
+        private int RATE = 44100; // sample rate of the sound card
+        private int BUFFERSIZE = (int)Math.Pow(2, 11); // must be a multiple of 2
+
         //spectograma
         private static int buffers_captured = 0; // total number of audio buffers filled
         private static int buffers_remaining = 0; // number of buffers which have yet to be analyzed
-
         private static double unanalyzed_max_sec= 2.5; // maximum amount of unanalyzed audio to maintain in memory
         private static List<short> unanalyzed_values = new List<short>(); // audio data lives here waiting to be analyzed
         private static List<List<double>> spec_data; // columns are time points, rows are frequency points
@@ -35,19 +43,21 @@ namespace Shazam
         private static int spec_height;
         int pixelsPerBuffer= 10;
         private static Random rand = new Random();
-        // sound card settings
         private int rate= 44100;
         private int buffer_update_hz= 20;
-        //spectograma
 
-        private int RATE = 44100; // sample rate of the sound card
-        private int BUFFERSIZE = (int)Math.Pow(2, 11); // must be a multiple of 2
+        //amprenta
+        private readonly SoundFingerprinting.DAO.IModelReference trackReference;
+        private readonly IModelService modelService = new InMemoryModelService(); // store fingerprints in RAM
+        private readonly IAudioService audioService = new SoundFingerprintingAudioService(); // default audio library
+
+
         public Form1()
         {
             InitializeComponent();
             
             var outputFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "NAudio");
-            Directory.CreateDirectory(outputFolder);
+            System.IO.Directory.CreateDirectory(outputFolder);
             var outputFilePath = Path.Combine(outputFolder, "recorded.wav");
             
             // get the WaveIn class started
@@ -314,6 +324,122 @@ namespace Shazam
         }
         private void label6_Click(object sender, EventArgs e)
         {
+
+        }
+        
+        public async Task StoreForLaterRetrieval(string pathToAudioFile)
+        {
+            if (pathToAudioFile.Contains("song1"))
+            {
+                var track = new TrackInfo("TCADX1833623", "Fur_Elise", "Beethoven", 10000);
+
+                // create fingerprints
+                var hashedFingerprints = await FingerprintCommandBuilder.Instance
+                                            .BuildFingerprintCommand()
+                                            .From(pathToAudioFile)
+                                            .UsingServices(audioService)
+                                            .Hash();
+
+                // store hashes in the database for later retrieval
+                modelService.Insert(track, hashedFingerprints);
+            }
+            else if(pathToAudioFile.Contains("song2"))
+            {
+                var track = new TrackInfo("TCADX1833624", "River_Flows_In_You", "Yiruma", 20000);
+
+                // create fingerprints
+                var hashedFingerprints = await FingerprintCommandBuilder.Instance
+                                            .BuildFingerprintCommand()
+                                            .From(pathToAudioFile)
+                                            .UsingServices(audioService)
+                                            .Hash();
+
+                // store hashes in the database for later retrieval
+                modelService.Insert(track, hashedFingerprints);
+            }
+            else if (pathToAudioFile.Contains("song3"))
+            {
+                var track = new TrackInfo("TCADX1833624", "Swimming", "Hans_Zimmer", 20000);
+
+                // create fingerprints
+                var hashedFingerprints = await FingerprintCommandBuilder.Instance
+                                            .BuildFingerprintCommand()
+                                            .From(pathToAudioFile)
+                                            .UsingServices(audioService)
+                                            .Hash();
+
+                // store hashes in the database for later retrieval
+                modelService.Insert(track, hashedFingerprints);
+            }
+            else if (pathToAudioFile.Contains("song4"))
+            {
+                var track = new TrackInfo("TCADX1833625", "Piano_Violin", "HipHopBeat", 20000);
+
+                // create fingerprints
+                var hashedFingerprints = await FingerprintCommandBuilder.Instance
+                                            .BuildFingerprintCommand()
+                                            .From(pathToAudioFile)
+                                            .UsingServices(audioService)
+                                            .Hash();
+
+                // store hashes in the database for later retrieval
+                modelService.Insert(track, hashedFingerprints);
+            }
+            else if (pathToAudioFile.Contains("song5"))
+            {
+                var track = new TrackInfo("TCADX1833626", "Crystallize", "Lindsey_Stirling", 20000);
+
+                // create fingerprints
+                var hashedFingerprints = await FingerprintCommandBuilder.Instance
+                                            .BuildFingerprintCommand()
+                                            .From(pathToAudioFile)
+                                            .UsingServices(audioService)
+                                            .Hash();
+
+                // store hashes in the database for later retrieval
+                modelService.Insert(track, hashedFingerprints);
+            }
+
+        }
+        public async Task<SoundFingerprinting.Query.QueryResult> GetBestMatchForSong(string queryAudioFile)
+        {
+            int secondsToAnalyze = 10; // number of seconds to analyze from query file
+            int startAtSecond = 0; // start at the begining
+
+            // query the underlying database for similar audio sub-fingerprints
+            var queryResult=await QueryCommandBuilder.Instance.BuildQueryCommand()
+                                                 .From(queryAudioFile, secondsToAnalyze, startAtSecond)
+                                                 .UsingServices(modelService, audioService)
+                                                 .Query();
+            return queryResult;
+        }
+
+        private async void button2_Click(object sender, EventArgs e)
+        {
+            var outputFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "NAudio");
+            var song1 = Path.Combine(outputFolder, "song1.wav");
+            var song2 = Path.Combine(outputFolder, "song2.wav");
+            var song3 = Path.Combine(outputFolder, "song3.wav");
+            var song4 = Path.Combine(outputFolder, "song4.wav");
+            var song5 = Path.Combine(outputFolder, "song5.wav");
+            var recorded_sample = Path.Combine(outputFolder, "recorded.wav");
+            await StoreForLaterRetrieval(song1);
+            await StoreForLaterRetrieval(song2);
+            await StoreForLaterRetrieval(song3);
+            await StoreForLaterRetrieval(song4);
+            await StoreForLaterRetrieval(song5);
+            
+            SoundFingerprinting.Query.QueryResult result=await GetBestMatchForSong(recorded_sample);
+            if (result.ContainsMatches)
+            {
+                List<SoundFingerprinting.Query.ResultEntry> list = result.ResultEntries.ToList();
+                MessageBox.Show("Melodia a fost găsită! \n Artist- " + list[0].Track.Artist + " Melodie- " + list[0].Track.Title);
+            }
+            else
+            {
+                MessageBox.Show("Melodia nu a fost găsită!");
+            }
+
 
         }
     }
