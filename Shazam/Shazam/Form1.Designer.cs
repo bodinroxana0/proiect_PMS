@@ -257,7 +257,7 @@
             this.Controls.Add(this.button1);
             this.Controls.Add(this.button3);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "Aplicație pentru găsirea unei melodii";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.groupBox1.ResumeLayout(false);

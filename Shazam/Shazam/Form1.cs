@@ -73,22 +73,21 @@ namespace Shazam
 
             WaveFileWriter writer = null;
             bool closing = false;
-            //pentru inregistrare audio
+
+            //inregistrare audio
             button1.Click += (s, a) =>
             {
                 UpdateAudioGraph();
                 //start timer
                 timer1.Enabled = true;
-                //prepare to write to wav file
+                //pregatirea scrierii in fisierului wav 
                 writer = new WaveFileWriter(outputFilePath, waveIn.WaveFormat);
-                
-                //start recording
+                //inceperea inregistrarii
                 waveIn.StartRecording();
-                
+                //butonul de pornire inregistrare este dezactivat
                 button1.Enabled = false;
+                //butonul de oprire inregistrare este activat
                 button3.Enabled = true;
-
-                // sound card configuration
                 spec_height = fft_size / 2;
                 // fill spectrogram data with empty values
                 spec_data = new List<List<double>>();
@@ -99,8 +98,6 @@ namespace Shazam
                 pictureBox1.Width = spec_data.Count;
                 pictureBox1.Height = spec_data[0].Count;
                 pictureBox1.Location = new Point(0, 0);
-                
-               // waveIn.BufferMilliseconds = 1000 / buffer_update_hz;
             };
             waveIn.DataAvailable += (s, a) =>
             {
@@ -131,7 +128,7 @@ namespace Shazam
             }
             
             };
-            //pentru oprire inregistrare
+            // oprire inregistrare
             button3.Click += (s, a) =>
             {
                 //stop timer
@@ -217,10 +214,8 @@ namespace Shazam
             for (int i = 0; i < data.Length; i++)
             {
                 fft[i] = fftComplex[i].Magnitude; // back to double
-                //fft[i] = Math.Log10(fft[i]); // convert to dB
             }
             return fft;
-            //todo: this could be much faster by reusing variables
         }
         void Analyze_values()
         {
@@ -313,7 +308,6 @@ namespace Shazam
         {
             miliseconds++;
             label2.Text = (timer1.Interval*miliseconds).ToString();
-
             Analyze_values();
             Update_bitmap_with_data();
             UpdateAudioGraph();
@@ -333,14 +327,14 @@ namespace Shazam
             {
                 var track = new TrackInfo("TCADX1833623", "Fur_Elise", "Beethoven", 10000);
 
-                // create fingerprints
+                // creare amprenta audio
                 var hashedFingerprints = await FingerprintCommandBuilder.Instance
                                             .BuildFingerprintCommand()
                                             .From(pathToAudioFile)
                                             .UsingServices(audioService)
                                             .Hash();
 
-                // store hashes in the database for later retrieval
+                // stocare hashe value in baza de date pentru interogare ulterioara
                 modelService.Insert(track, hashedFingerprints);
             }
             else if(pathToAudioFile.Contains("song2"))
@@ -403,10 +397,10 @@ namespace Shazam
         }
         public async Task<SoundFingerprinting.Query.QueryResult> GetBestMatchForSong(string queryAudioFile)
         {
-            int secondsToAnalyze = 10; // number of seconds to analyze from query file
-            int startAtSecond = 0; // start at the begining
+            int secondsToAnalyze = 10; // numarul de secunde pentru a fi analizat
+            int startAtSecond = 0; // start
 
-            // query the underlying database for similar audio sub-fingerprints
+            // interogarea bazei de date pentru gasirea unei amprente similare 
             var queryResult=await QueryCommandBuilder.Instance.BuildQueryCommand()
                                                  .From(queryAudioFile, secondsToAnalyze, startAtSecond)
                                                  .UsingServices(modelService, audioService)
